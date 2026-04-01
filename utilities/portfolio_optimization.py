@@ -40,8 +40,8 @@ def minimum_variance_portfolio(cov_matrix: np.ndarray) -> np.ndarray:
     n = cov_matrix.shape[0]
     ones_vec = np.ones((n, 1))
 
-    inv_cov = np.linalg.inv(cov_matrix)
-    min_var_ptf_numerator = inv_cov @ ones_vec
+    min_var_ptf_numerator = np.linalg.solve(cov_matrix, ones_vec)
+
     min_var_ptf_weights = min_var_ptf_numerator / (ones_vec.T @ min_var_ptf_numerator)
 
     return min_var_ptf_weights.flatten()
@@ -104,15 +104,13 @@ def mean_variance_portfolio(
 
     n = cov_matrix.shape[0]
     ones_vec = np.ones(n)
-    inv_cov = np.linalg.inv(cov_matrix)
+   
+    inv_cov_mu = np.linalg.solve(cov_matrix, expected_returns)
+    inv_cov_ones = np.linalg.solve(cov_matrix, ones_vec)
 
-    # Unconstrained MV portfolio: (1/γ) * Σ⁻¹ * μ
-    mv_unconstrained = (1.0 / risk_aversion) * inv_cov @ expected_returns
-
-    # Min variance portfolio (for the constraint)
-    inv_cov_ones = inv_cov @ ones_vec
+    mv_unconstrained = (1.0 / risk_aversion) * inv_cov_mu
     w_min_var = inv_cov_ones / (ones_vec @ inv_cov_ones)
-
+    
     # Adjust to satisfy sum-to-one constraint
     mean_var_ptf_weights = w_min_var + mv_unconstrained - (ones_vec @ mv_unconstrained) * w_min_var
 
