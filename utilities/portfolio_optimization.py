@@ -42,8 +42,9 @@ def minimum_variance_portfolio(cov_matrix: np.ndarray) -> np.ndarray:
 
     min_var_ptf_numerator = np.linalg.solve(cov_matrix, ones_vec)
 
-    min_var_ptf_weights = min_var_ptf_numerator / (ones_vec.T @ min_var_ptf_numerator)
+    C=(ones_vec.T @ min_var_ptf_numerator)
 
+    min_var_ptf_weights = min_var_ptf_numerator / C
     return min_var_ptf_weights.flatten()
 
 
