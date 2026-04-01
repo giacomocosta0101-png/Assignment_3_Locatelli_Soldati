@@ -25,12 +25,14 @@ def _align_portfolios_and_returns(
     aligned_portfolios = (
         portfolios.loc[:, overlapping_assets]
         .reindex(returns.index)
-        .bfill()
+        .ffill()
         .shift()
         .dropna(axis=0, how="all")
     )
     if aligned_portfolios.empty:
-        raise ValueError("portfolios and returns must overlap on at least one investable date")
+        raise ValueError(
+            "portfolios and returns must overlap on at least one investable date"
+        )
 
     aligned_returns = returns.loc[aligned_portfolios.index, overlapping_assets]
 
@@ -69,8 +71,4 @@ def backtest(portfolios: pd.DataFrame, returns: pd.DataFrame) -> pd.Series:
     Returns:
         pd.Series: Series representing the cumulative returns of the portfolios over time.
     """
-    return (
-        portfolio_returns(portfolios=portfolios, returns=returns)
-        .add(1)
-        .cumprod()
-    )
+    return portfolio_returns(portfolios=portfolios, returns=returns).add(1).cumprod()
